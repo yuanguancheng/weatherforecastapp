@@ -1,70 +1,136 @@
-# Getting Started with Create React App
+# 天气预报应用 (Weather Forecast App)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+一个基于React开发的现代化天气预报应用，提供实时天气信息和未来5天天气预报。
 
-## Available Scripts
+## 功能特点
 
-In the project directory, you can run:
+- 🌤️ 实时天气信息显示（温度、湿度、风速、天气状况）
+- 📅 未来5天天气预报
+- 🔍 支持中英文城市搜索
+- 💾 搜索历史记录
+- 🎨 根据天气状况动态变化的背景
+- 📱 响应式设计，适配各种设备
+- ⚡ 天气数据缓存，提高加载速度
 
-### `npm start`
+## 技术栈
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- React 19.2.0
+- CSS3 (Flexbox & Grid)
+- OpenWeatherMap API
+- LocalStorage (用于搜索历史)
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 安装与运行
 
-### `npm test`
+### 前置要求
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- Node.js (推荐 v14 或更高版本)
+- npm 或 yarn
 
-### `npm run build`
+### 安装步骤
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+1. 克隆仓库
+```bash
+git clone https://github.com/yuanguancheng/weatherforecastapp.git
+cd weatherforecastapp
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+2. 安装依赖
+```bash
+npm install
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+3. 启动开发服务器
+```bash
+npm start
+```
 
-### `npm run eject`
+应用将在 [http://localhost:3000](http://localhost:3000) 上运行。
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## 构建与部署
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### 构建生产版本
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```bash
+npm run build
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+这将创建一个优化的生产版本到 `build` 文件夹。
 
-## Learn More
+### 部署到GitHub Pages
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+1. 首先确保您已经配置了GitHub仓库
+2. 运行以下命令：
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```bash
+npm run deploy
+```
 
-### Code Splitting
+### 环境变量配置
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+如需使用自定义API密钥，创建 `.env` 文件：
 
-### Analyzing the Bundle Size
+```env
+REACT_APP_WEATHER_API_KEY=your_api_key_here
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+然后在 `src/utils/apiConfig.js` 中引用：
 
-### Making a Progressive Web App
+```javascript
+const API_CONFIG = {
+  API_KEY: process.env.REACT_APP_WEATHER_API_KEY || 'default_key'
+};
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## 项目结构
 
-### Advanced Configuration
+```
+weatherforecastapp/
+├── public/                 # 静态资源
+├── src/
+│   ├── components/         # React组件
+│   │   └── WeatherIcon.js  # 天气图标组件
+│   ├── utils/              # 工具函数
+│   │   ├── apiConfig.js    # API配置
+│   │   ├── weatherAPI.js   # 天气API调用
+│   │   ├── weatherCache.js # 天气数据缓存
+│   │   ├── weatherIcons.js # 天气图标映射
+│   │   └── errorHandler.js # 错误处理
+│   ├── App.js              # 主应用组件
+│   ├── WeatherApp.js       # 天气应用主组件
+│   ├── WeatherApp.css      # 样式文件
+│   └── index.js            # 应用入口
+├── package.json            # 项目配置
+└── README.md               # 项目说明
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## API使用
 
-### Deployment
+本项目使用 [OpenWeatherMap API](https://openweathermap.org/api) 获取天气数据。
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+### API端点
 
-### `npm run build` fails to minify
+- 当前天气: `https://api.openweathermap.org/data/2.5/weather`
+- 5天预报: `https://api.openweathermap.org/data/2.5/forecast`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### 使用说明
+
+1. 在输入框中输入城市名称（支持中文或英文）
+2. 点击"搜索"按钮或按回车键
+3. 查看当前天气和未来5天预报
+4. 点击预报日期可查看详细信息
+
+## 自定义配置
+
+如需使用自己的API密钥，请修改 `src/utils/apiConfig.js` 文件中的 `API_KEY` 值。
+
+## 贡献
+
+欢迎提交问题和拉取请求来改进这个项目。
+
+## 许可证
+
+MIT License
+
+## 在线演示
+
+[ https://yuanguancheng.github.io/weatherforecastapp/]( https://yuanguancheng.github.io/weatherforecastapp/)

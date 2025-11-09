@@ -1,6 +1,7 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "天气预报",
+  "name": "天气预报应用 - 实时天气查询",
+  "description": "现代化的天气预报应用，提供实时天气信息和未来5天预报",
   "icons": [
     {
       "src": "favicon.ico",
@@ -20,6 +21,6 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#0984e3",
+  "background_color": "#74b9ff"
 }
