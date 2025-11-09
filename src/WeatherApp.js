@@ -1,8 +1,9 @@
 // src/WeatherApp.js
 import React, { useState, useEffect } from 'react';
 import { fetchCurrentWeather, fetchWeatherForecast } from './utils/weatherAPI';
-import { getWeatherIcon } from './utils/weatherIcons';
+import { getWeatherIcon, getWeatherGradient } from './utils/weatherIcons';
 import { validateCityInput, getErrorIcon, getRetrySuggestion } from './utils/errorHandler';
+import WeatherIcon from './components/WeatherIcon';
 import './WeatherApp.css';
 import API_CONFIG from './utils/apiConfig';
 
@@ -20,6 +21,7 @@ function WeatherApp() {
   const [showDetails, setShowDetails] = useState(false);
   const [selectedDay, setSelectedDay] = useState(null);
   const [inputError, setInputError] = useState(null);
+  const [weatherGradient, setWeatherGradient] = useState('linear-gradient(135deg, #74b9ff, #0984e3)');
 
   // 从本地存储加载搜索历史
   useEffect(() => {
@@ -90,6 +92,9 @@ function WeatherApp() {
       setForecastData(forecast);
       setLastUpdated(new Date());
 
+      // 根据天气状态更新背景
+      setWeatherGradient(getWeatherGradient(currentWeather.icon));
+
       // 保存到搜索历史
       saveSearchHistory(searchCity);
 
@@ -146,7 +151,7 @@ function WeatherApp() {
   };
 
   return (
-    <div className="weather-app">
+    <div className="weather-app" style={{ background: weatherGradient }}>
       <div className="weather-container">
         <h1 className="app-title">天气预报</h1>
 
@@ -241,8 +246,9 @@ function WeatherApp() {
                   <div className="temperature">{weatherData.temperature}°C</div>
                   <div className="feels-like">体感温度 {weatherData.feels_like}°C</div>
                 </div>
+                {/* // 在主天气显示区域 */}
                 <div className="condition-info">
-                  <div className="weather-icon">{getWeatherIcon(weatherData.icon).icon}</div>
+                  <WeatherIcon iconCode={weatherData.icon} size="large" useSvg={true} />
                   <div className="condition">{weatherData.condition}</div>
                 </div>
               </div>
@@ -298,7 +304,10 @@ function WeatherApp() {
                       onClick={() => handleDayClick(day)}
                     >
                       <div className="forecast-date">{day.dayName}</div>
-                      <div className="forecast-icon">{getWeatherIcon(day.icon).icon}</div>
+                      {/* 使用新的 WeatherIcon 组件 */}
+                      <div className="forecast-icon">
+                        <WeatherIcon iconCode={day.icon} size="medium" useSvg={true} />
+                      </div>
                       <div className="forecast-condition">{day.condition}</div>
                       <div className="forecast-temps">
                         <span className="temp-max">{day.maxTemp}°</span>
@@ -319,8 +328,9 @@ function WeatherApp() {
                     <button className="close-button" onClick={closeDetails}>×</button>
                   </div>
                   <div className="modal-body">
+                    {/* // 在详情模态框中 */}
                     <div className="day-weather-main">
-                      <div className="day-weather-icon">{getWeatherIcon(selectedDay.icon).icon}</div>
+                      <WeatherIcon iconCode={selectedDay.icon} size="xlarge" useSvg={true} />
                       <div className="day-weather-condition">{selectedDay.condition}</div>
                     </div>
                     <div className="day-temps">
