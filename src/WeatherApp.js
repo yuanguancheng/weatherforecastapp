@@ -1,14 +1,18 @@
 // src/WeatherApp.js
 import React, { useState } from 'react';
+import { fetchCurrentWeather, fetchWeatherForecast } from './utils/weatherAPI';
+import { getWeatherIcon } from './utils/weatherIcons';
 import './WeatherApp.css';
+import API_CONFIG from './utils/apiConfig';
 
 function WeatherApp() {
   const [city, setCity] = useState('');
   const [weatherData, setWeatherData] = useState(null);
+  const [forecastData, setForecastData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // 处理输入框变化 - 存储用户输入的城市名称
+  // 处理输入框变化
   const handleInputChange = (e) => {
     setCity(e.target.value);
     // 如果用户开始输入，清除之前的错误信息
@@ -17,36 +21,7 @@ function WeatherApp() {
     }
   };
 
-  // 模拟天气API调用（后续替换为真实API）
-  const fetchWeatherData = async (cityName) => {
-    // 模拟API延迟
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    // 模拟API响应数据
-    if (cityName.toLowerCase() === 'beijing' || cityName === '北京') {
-      return {
-        city: '北京',
-        temperature: 22,
-        condition: '晴',
-        humidity: 45,
-        windSpeed: 12,
-        icon: 'sunny'
-      };
-    } else if (cityName.toLowerCase() === 'shanghai' || cityName === '上海') {
-      return {
-        city: '上海',
-        temperature: 25,
-        condition: '多云',
-        humidity: 65,
-        windSpeed: 8,
-        icon: 'cloudy'
-      };
-    } else {
-      throw new Error('未找到该城市的天气信息，请检查城市名称是否正确');
-    }
-  };
-
-  // 处理搜索 - 绑定搜索按钮 onClick 事件
+  // 处理搜索
   const handleSearch = async () => {
     // 验证输入
     if (!city.trim()) {
@@ -61,14 +36,20 @@ function WeatherApp() {
     setLoading(true);
 
     try {
-      // 调用天气API
-      const data = await fetchWeatherData(city);
-      setWeatherData(data);
+      // 并行获取当前天气和预报数据
+      const [currentWeather, forecast] = await Promise.all([
+        fetchCurrentWeather(city),
+        fetchWeatherForecast(city)
+      ]);
+
+      setWeatherData(currentWeather);
+      setForecastData(forecast);
     } catch (err) {
       // 设置错误信息
       setError(err.message);
       // 清除天气数据
       setWeatherData(null);
+      setForecastData([]);
     } finally {
       // 结束加载状态
       setLoading(false);
@@ -88,23 +69,32 @@ function WeatherApp() {
         <h1 className="app-title">天气预报</h1>
 
         <div className="search-section">
+          {/* // 在 WeatherApp.js 中更新输入框的 placeholder */}
           <input
             type="text"
             className="search-input"
-            placeholder="请输入城市名称（如：北京、上海）"
+            placeholder="请输入城市名称（中文或英文，如：北京、Beijing）"
             value={city}
-            onChange={handleInputChange}  // 绑定 onChange 事件
+            onChange={handleInputChange}
             onKeyPress={handleKeyPress}
             disabled={loading}
           />
+
           <button
             className="search-button"
-            onClick={handleSearch}  // 绑定 onClick 事件
+            onClick={handleSearch}
             disabled={loading}
           >
             {loading ? '搜索中...' : '搜索'}
           </button>
         </div>
+        {/* // 在 WeatherApp.js 的 return 语句中添加以下内容
+        {(!API_CONFIG.API_KEY || API_CONFIG.API_KEY === 'your_actual_api_key_here') && (
+          <div className="api-warning">
+            <p>当前使用模拟数据，请设置有效的 OpenWeatherMap API 密钥以获取真实天气数据</p>
+          </div>
+        )} */}
+
 
         {loading && (
           <div className="loading-section">
@@ -120,23 +110,65 @@ function WeatherApp() {
         )}
 
         {weatherData && (
-          <div className="weather-display">
-            <h2>{weatherData.city}</h2>
-            <div className="weather-main">
-              <div className="temperature">{weatherData.temperature}°C</div>
-              <div className="condition">{weatherData.condition}</div>
-            </div>
-            <div className="weather-details">
-              <div className="detail-item">
-                <span className="detail-label">湿度:</span>
-                <span className="detail-value">{weatherData.humidity}%</span>
+          <>
+            <div className="weather-display">
+              <h2>{weatherData.city}, {weatherData.country}</h2>
+              <div className="weather-main">
+                <div className="temperature">{weatherData.temperature}°C</div>
+                <div className="condition-info">
+                  <div className="weather-icon">{getWeatherIcon(weatherData.icon).icon}</div>
+                  <div className="condition">{weatherData.condition}</div>
+                </div>
               </div>
-              <div className="detail-item">
-                <span className="detail-label">风速:</span>
-                <span className="detail-value">{weatherData.windSpeed} km/h</span>
+              <div className="weather-details">
+                <div className="detail-item">
+                  <span className="detail-label">湿度:</span>
+                  <span className="detail-value">{weatherData.humidity}%</span>
+                </div>
+                <div className="detail-item">
+                  <span className="detail-label">风速:</span>
+                  <span className="detail-value">{weatherData.windSpeed} m/s</span>
+                </div>
+                <div className="detail-item">
+                  <span className="detail-label">气压:</span>
+                  <span className="detail-value">{weatherData.pressure} hPa</span>
+                </div>
+                <div className="detail-item">
+                  <span className="detail-label">能见度:</span>
+                  <span className="detail-value">{weatherData.visibility} km</span>
+                </div>
+              </div>
+              <div className="sun-times">
+                <div className="sun-time">
+                  <span className="sun-label">日出</span>
+                  <span className="sun-value">{weatherData.sunrise}</span>
+                </div>
+                <div className="sun-time">
+                  <span className="sun-label">日落</span>
+                  <span className="sun-value">{weatherData.sunset}</span>
+                </div>
               </div>
             </div>
-          </div>
+
+            {forecastData.length > 0 && (
+              <div className="forecast-section">
+                <h3>未来5天预报</h3>
+                <div className="forecast-container">
+                  {forecastData.map((day, index) => (
+                    <div key={index} className="forecast-day">
+                      <div className="forecast-date">{day.dayName}</div>
+                      <div className="forecast-icon">{getWeatherIcon(day.icon).icon}</div>
+                      <div className="forecast-condition">{day.condition}</div>
+                      <div className="forecast-temps">
+                        <span className="temp-max">{day.maxTemp}°</span>
+                        <span className="temp-min">{day.minTemp}°</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
