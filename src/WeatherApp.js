@@ -6,6 +6,9 @@ import { validateCityInput, getErrorIcon, getRetrySuggestion } from './utils/err
 import WeatherIcon from './components/WeatherIcon';
 import './WeatherApp.css';
 import API_CONFIG from './utils/apiConfig';
+// 在文件顶部添加导入
+import { getCachedWeatherData, setCachedWeatherData } from './utils/weatherCache';
+import { debounce } from './utils/debounce';
 
 function WeatherApp() {
   // 基本状态
@@ -62,7 +65,12 @@ function WeatherApp() {
   };
 
   // 处理搜索
-  const handleSearch = async (searchCity = city) => {
+  // 2. 修改 handleSearch 函数
+  const handleSearch = (searchCity = city) => {
+    debouncedSearch(searchCity);
+  };
+  // 1. 添加防抖处理后的搜索函数
+  const debouncedSearch = debounce(async (searchCity) => {
     // 验证输入
     const validation = validateCityInput(searchCity);
     if (!validation.isValid) {
@@ -70,11 +78,25 @@ function WeatherApp() {
       setInputError(null);
       return;
     }
-
     // 清除之前的错误信息
     setError(null);
     setInputError(null);
+    // 检查缓存
+    const cachedData = getCachedWeatherData(searchCity.toLowerCase());
+    if (cachedData) {
+      setWeatherData(cachedData.currentWeather);
+      setForecastData(cachedData.forecast);
+      setLastUpdated(new Date(cachedData.timestamp));
 
+      // 根据天气状态更新背景
+      setWeatherGradient(getWeatherGradient(cachedData.currentWeather.icon));
+
+      // 保存到搜索历史
+      saveSearchHistory(searchCity);
+
+      console.log('使用缓存数据');
+      return;
+    }
     // 设置加载状态
     setLoading(true);
 
@@ -111,7 +133,7 @@ function WeatherApp() {
       // 结束加载状态
       setLoading(false);
     }
-  };
+  }, 500);// 500毫秒的防抖延迟
 
   // 处理回车键
   const handleKeyPress = (e) => {
