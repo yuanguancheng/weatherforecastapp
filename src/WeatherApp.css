@@ -49,27 +49,39 @@ body {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
-/* 搜索区域 */
+/* 搜索区域 - 修改后的样式 */
 .search-section {
   display: flex;
-  margin-bottom: 20px;
-  gap: 10px;
+  margin-bottom: 10px;
+  /* 减少底部边距 */
+  gap: 8px;
+  /* 调整间距 */
+  align-items: stretch;
+  /* 确保高度一致 */
 }
 
 .input-container {
   flex: 1;
   position: relative;
+  margin-bottom: 0;
+  /* 移除底部边距 */
 }
 
 .search-input {
-  flex: 1;
-  padding: 15px;
+  width: 100%;
+  /* 确保占满容器宽度 */
+  padding: 16px 20px;
+  /* 增加内边距，特别是左右 */
   border: 2px solid #e0e0e0;
   border-radius: 12px;
   font-size: 1rem;
   outline: none;
   transition: all 0.3s ease;
   background-color: rgba(255, 255, 255, 0.8);
+  min-height: 50px;
+  /* 设置最小高度 */
+  box-sizing: border-box;
+  /* 确保padding不会增加总宽度 */
 }
 
 .search-input:focus {
@@ -84,7 +96,8 @@ body {
 }
 
 .search-button {
-  padding: 15px 25px;
+  padding: 16px 20px;
+  /* 与输入框高度匹配 */
   background-color: #0984e3;
   color: white;
   border: none;
@@ -94,6 +107,13 @@ body {
   font-weight: 600;
   transition: all 0.3s ease;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  white-space: nowrap;
+  /* 防止按钮文字换行 */
+  min-height: 50px;
+  /* 与输入框高度匹配 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .search-button:hover {
@@ -114,33 +134,43 @@ body {
   box-shadow: none;
 }
 
-/* 输入错误提示 */
+/* 输入错误提示 - 调整位置 */
 .input-error {
   position: absolute;
-  bottom: -22px;
+  bottom: -20px;
+  /* 调整位置 */
   left: 0;
   display: flex;
   align-items: center;
   font-size: 0.8rem;
   color: #ff7675;
+  white-space: nowrap;
+  /* 防止文字换行 */
+  z-index: 1;
+  /* 确保在其他元素之上 */
 }
 
 .error-icon {
   margin-right: 5px;
+  flex-shrink: 0;
+  /* 防止图标缩小 */
 }
 
-/* 搜索历史 */
+/* 搜索历史 - 减少上边距 */
 .search-history {
-  margin-bottom: 20px;
+  margin-bottom: 10px;
+  /* 减少底部边距 */
   text-align: left;
 }
 
 .search-history p {
-  margin: 0 0 10px 0;
+  margin: 0 0 5px 0;
+  /* 减少底部边距 */
   font-size: 0.9rem;
   color: #636e72;
   font-weight: 500;
 }
+
 
 .history-items {
   display: flex;
@@ -288,9 +318,10 @@ body {
   background-color: rgba(255, 255, 255, 0.3);
 }
 
-/* 天气展示 */
+/* 天气展示 - 减少上边距 */
 .weather-display {
-  margin-top: 20px;
+  margin-top: 10px;
+  /* 减少上边距 */
   padding: 20px;
   background-color: rgba(255, 255, 255, 0.7);
   border-radius: 15px;
@@ -430,9 +461,10 @@ body {
   color: #2d3436;
 }
 
-/* 预报部分 */
+/* 预报部分 - 减少上边距 */
 .forecast-section {
-  margin-top: 30px;
+  margin-top: 15px;
+  /* 减少上边距 */
 }
 
 .forecast-section h3 {
@@ -665,8 +697,11 @@ body {
   }
 
   .search-section {
-    flex-direction: column;
+    flex-direction: row;
+    /* 保持在一行 */
     gap: 10px;
+    margin-bottom: 12px;
+    /* 减少底部边距 */
   }
 
   .search-button {
