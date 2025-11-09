@@ -563,3 +563,110 @@
     gap: 15px;
   }
 }
+
+/* 在 WeatherApp.css 中添加以下样式 */
+
+/* 输入框容器 */
+.input-container {
+  flex: 1;
+  position: relative;
+}
+
+/* 输入框错误状态 */
+.search-input.error {
+  border-color: #ff7675;
+}
+
+/* 输入错误提示 */
+.input-error {
+  position: absolute;
+  bottom: -22px;
+  left: 0;
+  display: flex;
+  align-items: center;
+  font-size: 0.8rem;
+  color: #ff7675;
+}
+
+.error-icon {
+  margin-right: 5px;
+}
+
+/* 错误状态增强 */
+.error-section {
+  background-color: #ff7675;
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  margin: 20px 0;
+  text-align: center;
+}
+
+.error-section .error-icon {
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+.error-message {
+  margin: 0 0 10px 0;
+  font-size: 1rem;
+}
+
+.error-suggestion {
+  margin: 0 0 15px 0;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.error-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.retry-button,
+.clear-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.retry-button {
+  background-color: white;
+  color: #ff7675;
+}
+
+.retry-button:hover {
+  background-color: #f0f0f0;
+}
+
+.clear-button {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.clear-button:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* 搜索按钮禁用状态 */
+.search-button:disabled {
+  background-color: #b2bec3;
+  cursor: not-allowed;
+}
+
+/* 响应式设计更新 */
+@media (max-width: 600px) {
+  .error-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .retry-button,
+  .clear-button {
+    width: 100%;
+  }
+}

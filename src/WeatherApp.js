@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { fetchCurrentWeather, fetchWeatherForecast } from './utils/weatherAPI';
 import { getWeatherIcon } from './utils/weatherIcons';
+import { validateCityInput, getErrorIcon, getRetrySuggestion } from './utils/errorHandler';
 import './WeatherApp.css';
 import API_CONFIG from './utils/apiConfig';
 
@@ -18,6 +19,7 @@ function WeatherApp() {
   const [lastUpdated, setLastUpdated] = useState(null);
   const [showDetails, setShowDetails] = useState(false);
   const [selectedDay, setSelectedDay] = useState(null);
+  const [inputError, setInputError] = useState(null);
 
   // 从本地存储加载搜索历史
   useEffect(() => {
@@ -36,23 +38,40 @@ function WeatherApp() {
 
   // 处理输入框变化
   const handleInputChange = (e) => {
-    setCity(e.target.value);
-    // 如果用户开始输入，清除之前的错误信息
+    const value = e.target.value;
+    setCity(value);
+
+    // 清除之前的错误信息
     if (error) {
       setError(null);
+    }
+
+    // 实时验证输入
+    if (value.trim()) {
+      const validation = validateCityInput(value);
+      if (!validation.isValid) {
+        setInputError(validation.error);
+      } else {
+        setInputError(null);
+      }
+    } else {
+      setInputError(null);
     }
   };
 
   // 处理搜索
   const handleSearch = async (searchCity = city) => {
     // 验证输入
-    if (!searchCity.trim()) {
-      setError('请输入城市名称');
+    const validation = validateCityInput(searchCity);
+    if (!validation.isValid) {
+      setError(validation.error);
+      setInputError(null);
       return;
     }
 
-    // 清除上一次的错误提示
+    // 清除之前的错误信息
     setError(null);
+    setInputError(null);
 
     // 设置加载状态
     setLoading(true);
@@ -79,7 +98,7 @@ function WeatherApp() {
       console.log(`API响应时间: ${responseTime}ms`);
     } catch (err) {
       // 设置错误信息
-      setError(err.message);
+      setError(err);
       // 清除天气数据
       setWeatherData(null);
       setForecastData([]);
@@ -132,19 +151,27 @@ function WeatherApp() {
         <h1 className="app-title">天气预报</h1>
 
         <div className="search-section">
-          <input
-            type="text"
-            className="search-input"
-            placeholder="请输入城市名称（中文或英文，如：北京、Beijing）"
-            value={city}
-            onChange={handleInputChange}
-            onKeyPress={handleKeyPress}
-            disabled={loading}
-          />
+          <div className="input-container">
+            <input
+              type="text"
+              className={`search-input ${inputError ? 'error' : ''}`}
+              placeholder="请输入城市名称（中文或英文，如：北京、Beijing）"
+              value={city}
+              onChange={handleInputChange}
+              onKeyPress={handleKeyPress}
+              disabled={loading}
+            />
+            {inputError && (
+              <div className="input-error">
+                <span className="error-icon">⚠️</span>
+                <span className="error-text">{inputError.message}</span>
+              </div>
+            )}
+          </div>
           <button
             className="search-button"
             onClick={() => handleSearch()}
-            disabled={loading}
+            disabled={loading || !!inputError}
           >
             {loading ? '搜索中...' : '搜索'}
           </button>
@@ -184,11 +211,17 @@ function WeatherApp() {
         {/* 错误状态 */}
         {error && (
           <div className="error-section">
-            <div className="error-icon">⚠️</div>
-            <p className="error-message">{error}</p>
-            <button className="retry-button" onClick={() => handleSearch()}>
-              重试
-            </button>
+            <div className="error-icon">{getErrorIcon(error.type)}</div>
+            <p className="error-message">{error.message}</p>
+            <p className="error-suggestion">{getRetrySuggestion(error.type)}</p>
+            <div className="error-actions">
+              <button className="retry-button" onClick={() => handleSearch()}>
+                重试
+              </button>
+              <button className="clear-button" onClick={() => setError(null)}>
+                关闭
+              </button>
+            </div>
           </div>
         )}
 
@@ -206,7 +239,7 @@ function WeatherApp() {
               <div className="weather-main">
                 <div className="temperature-section">
                   <div className="temperature">{weatherData.temperature}°C</div>
-                  <div className="feels-like">体感温度 {weatherData.feels_like || weatherData.temperature}°C</div>
+                  <div className="feels-like">体感温度 {weatherData.feels_like}°C</div>
                 </div>
                 <div className="condition-info">
                   <div className="weather-icon">{getWeatherIcon(weatherData.icon).icon}</div>

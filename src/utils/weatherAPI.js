@@ -1,5 +1,6 @@
 // src/utils/weatherAPI.js
 import API_CONFIG from './apiConfig';
+import { parseApiError } from './errorHandler';
 
 // 中文城市名称到英文城市名称的映射
 const cityMapping = {
@@ -60,6 +61,43 @@ const getEnglishCityName = (cityName) => {
 };
 
 /**
+ * 执行API请求并处理错误
+ * @param {string} url - API请求URL
+ * @param {string} cityName - 城市名称
+ * @returns {Promise<Object>} API响应数据
+ */
+const executeApiRequest = async (url, cityName) => {
+  try {
+    console.log('请求URL:', url);
+
+    // 设置请求超时
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10秒超时
+
+    const response = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('API错误响应:', errorData);
+
+      // 抛出带有API错误信息的错误
+      throw new Error(errorData.message || `API请求失败 (${response.status})`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    // 如果是超时错误
+    if (error.name === 'AbortError') {
+      throw new Error('请求超时，请检查网络连接');
+    }
+
+    // 其他错误直接抛出
+    throw error;
+  }
+};
+
+/**
  * 获取当前天气数据
  * @param {string} cityName - 城市名称
  * @returns {Promise<Object>} 天气数据
@@ -73,23 +111,8 @@ export const fetchCurrentWeather = async (cityName) => {
 
     console.log('原始城市名称:', cityName);
     console.log('英文城市名称:', englishCityName);
-    console.log('请求URL:', url);
 
-    const response = await fetch(url);
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error('API错误响应:', errorData);
-
-      // 如果是城市未找到错误，提供更友好的错误信息
-      if (errorData.cod === '404') {
-        throw new Error(`未找到城市"${cityName}"的天气信息，请尝试使用英文城市名称或检查拼写`);
-      }
-
-      throw new Error(errorData.message || '获取天气数据失败');
-    }
-
-    const data = await response.json();
+    const data = await executeApiRequest(url, cityName);
     console.log('API响应数据:', data);
 
     // 提取需要的字段
@@ -97,6 +120,7 @@ export const fetchCurrentWeather = async (cityName) => {
       city: data.name,
       country: data.sys.country,
       temperature: Math.round(data.main.temp),
+      feels_like: Math.round(data.main.feels_like),
       condition: data.weather[0].description,
       humidity: data.main.humidity,
       windSpeed: data.wind.speed,
@@ -108,7 +132,9 @@ export const fetchCurrentWeather = async (cityName) => {
     };
   } catch (error) {
     console.error('获取当前天气数据错误:', error);
-    throw error;
+    // 使用错误处理工具解析错误
+    const parsedError = parseApiError(error, cityName);
+    throw parsedError;
   }
 };
 
@@ -126,23 +152,8 @@ export const fetchWeatherForecast = async (cityName) => {
 
     console.log('预报请求 - 原始城市名称:', cityName);
     console.log('预报请求 - 英文城市名称:', englishCityName);
-    console.log('预报请求URL:', url);
 
-    const response = await fetch(url);
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error('预报API错误响应:', errorData);
-
-      // 如果是城市未找到错误，提供更友好的错误信息
-      if (errorData.cod === '404') {
-        throw new Error(`未找到城市"${cityName}"的天气预报信息，请尝试使用英文城市名称或检查拼写`);
-      }
-
-      throw new Error(errorData.message || '获取天气预报数据失败');
-    }
-
-    const data = await response.json();
+    const data = await executeApiRequest(url, cityName);
     console.log('预报API响应数据:', data);
 
     // 处理预报数据，按天分组
@@ -206,7 +217,9 @@ export const fetchWeatherForecast = async (cityName) => {
     return forecastArray.slice(1, 6);
   } catch (error) {
     console.error('获取天气预报数据错误:', error);
-    throw error;
+    // 使用错误处理工具解析错误
+    const parsedError = parseApiError(error, cityName);
+    throw parsedError;
   }
 };
 
@@ -224,23 +237,8 @@ export const fetchCityCoordinates = async (cityName) => {
 
     console.log('坐标请求 - 原始城市名称:', cityName);
     console.log('坐标请求 - 英文城市名称:', englishCityName);
-    console.log('坐标请求URL:', url);
 
-    const response = await fetch(url);
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error('坐标API错误响应:', errorData);
-
-      // 如果是城市未找到错误，提供更友好的错误信息
-      if (errorData.cod === '404') {
-        throw new Error(`未找到城市"${cityName}"的坐标信息，请尝试使用英文城市名称或检查拼写`);
-      }
-
-      throw new Error(errorData.message || '获取城市坐标失败');
-    }
-
-    const data = await response.json();
+    const data = await executeApiRequest(url, cityName);
     console.log('坐标API响应数据:', data);
 
     if (data.length === 0) {
@@ -255,6 +253,8 @@ export const fetchCityCoordinates = async (cityName) => {
     };
   } catch (error) {
     console.error('获取城市坐标错误:', error);
-    throw error;
+    // 使用错误处理工具解析错误
+    const parsedError = parseApiError(error, cityName);
+    throw parsedError;
   }
 };
