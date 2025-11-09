@@ -1,0 +1,119 @@
+/* src/WeatherApp.css */
+.weather-app {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #74b9ff, #0984e3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  font-family: 'Arial', sans-serif;
+}
+
+.weather-container {
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  width: 100%;
+  max-width: 500px;
+  text-align: center;
+}
+
+.app-title {
+  color: #2d3436;
+  margin-bottom: 30px;
+  font-size: 2.5rem;
+}
+
+.search-section {
+  display: flex;
+  margin-bottom: 30px;
+  gap: 10px;
+}
+
+.search-input {
+  flex: 1;
+  padding: 15px;
+  border: 2px solid #dfe6e9;
+  border-radius: 10px;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.search-input:focus {
+  border-color: #74b9ff;
+}
+
+.search-button {
+  padding: 15px 25px;
+  background-color: #0984e3;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s;
+}
+
+.search-button:hover {
+  background-color: #74b9ff;
+}
+
+.loading-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20px 0;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top-color: #0984e3;
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 10px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.error-section {
+  background-color: #ff7675;
+  color: white;
+  padding: 15px;
+  border-radius: 10px;
+  margin: 20px 0;
+}
+
+.weather-display {
+  margin-top: 30px;
+  padding: 20px;
+  background-color: #f5f3f0;
+  border-radius: 15px;
+  text-align: left;
+}
+
+/* 响应式设计 */
+@media (max-width: 600px) {
+  .weather-container {
+    padding: 20px;
+  }
+
+  .app-title {
+    font-size: 2rem;
+  }
+
+  .search-section {
+    flex-direction: column;
+  }
+
+  .search-button {
+    width: 100%;
+  }
+}
